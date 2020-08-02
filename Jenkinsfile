@@ -46,6 +46,7 @@ pipeline {
                 dir('api-test') {
                     git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-api-test'
                     sh'''
+                      cd ${WORKSPACE}
                       ./mvnw test
                     '''
                 }
