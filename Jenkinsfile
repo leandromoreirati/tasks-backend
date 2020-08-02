@@ -61,7 +61,7 @@ pipeline {
                       cd ${WORKSPACE}
                       ./mvnw clean package
                      '''
-                      deploy adapters: [tomcat8(credentialsId: 'tomcat-login', path: '', url: 'http://tomcat:8000/')], contextPath: 'tasks', war: 'target/tasks.war'
+                    deploy adapters: [tomcat8(credentialsId: 'tomcat-login', path: '', url: 'http://tomcat:8000/')], contextPath: 'tasks', war: 'target/tasks.war'
                 }
             }
         }
