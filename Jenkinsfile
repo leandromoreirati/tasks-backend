@@ -56,7 +56,7 @@ pipeline {
         stage ('Deploy Frontend') {
             steps {
                 dir('frontend') {
-                    git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-frontend'
+                    git credentialsId: 'github-secret', url: 'https://github.com/leandromoreirati/tasks-frontend.git'
                     sh'''
                       cd ${WORKSPACE}
                       ./mvnw clean package
