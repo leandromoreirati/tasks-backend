@@ -44,9 +44,8 @@ pipeline {
         stage ('API Test') {
             steps {
                 dir('api-test') {
-                    git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-api-test'
+                    git credentialsId: 'github-secret', url: 'https://github.com/leandromoreirati//tasks-api-test'
                     sh'''
-                      cd ${WORKSPACE}
                       ./mvnw test
                     '''
                 }
@@ -55,7 +54,7 @@ pipeline {
         stage ('Deploy Frontend') {
             steps {
                 dir('frontend') {
-                    git credentialsId: 'github-secret', url: 'https://github.com/leandromoreirati/tasks-frontend.git'
+                    git credentialsId: 'github-secret', url: 'https://github.com/leandromoreirati/tasks-frontend'
                     sh'''
                       ./mvnw clean package
                      '''
@@ -66,7 +65,7 @@ pipeline {
         stage ('Functional Test') {
             steps {
                 dir('functional-test') {
-                    git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-functional-tests'
+                    git credentialsId: 'github-secret', url: 'https://github.com/leandromoreirati/tasks-functional-tests'
                     sh'''
                       ./mvnw test
                     '''
