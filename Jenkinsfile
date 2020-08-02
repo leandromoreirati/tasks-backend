@@ -11,7 +11,6 @@ pipeline {
         stage ('Unit Tests') {
             steps {
                 sh'''
-                  cd ${WORKSPACE}
                   ./mvnw test
                 '''
             }
@@ -47,7 +46,6 @@ pipeline {
                 dir('api-test') {
                     git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-api-test'
                     sh'''
-                      cd ${WORKSPACE}
                       ./mvnw test
                     '''
                 }
@@ -58,7 +56,6 @@ pipeline {
                 dir('frontend') {
                     git credentialsId: 'github-secret', url: 'https://github.com/leandromoreirati/tasks-frontend.git'
                     sh'''
-                      cd ${WORKSPACE}
                       ./mvnw clean package
                      '''
                     deploy adapters: [tomcat8(credentialsId: 'tomcat-login', path: '', url: 'http://tomcat:8000/')], contextPath: 'tasks', war: 'target/tasks.war'
@@ -70,7 +67,6 @@ pipeline {
                 dir('functional-test') {
                     git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-functional-tests'
                     sh'''
-                      cd ${WORKSPACE}
                       ./mvnw test
                     '''
                 }
