@@ -4,7 +4,6 @@ pipeline {
         stage ('Build Backend') {
             steps {
                 sh'''
-                  cd ${WORKSPACE}
                   ./mvnw clean package -DskipTests=true
                 '''
             }
