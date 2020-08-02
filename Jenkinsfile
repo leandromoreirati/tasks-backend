@@ -21,12 +21,10 @@ pipeline {
                     scannerHome = tool 'sonarScanner'
                 }
             steps {
-                withSonarQubeEnv('SONAR_LOCAL') {
                     sh'''
                      echo ${scannerHome}
                      /var/jenkins_home/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner/bin/sonar-scanner -e -Dsonar.projectKey=Backend -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=08c561cdf322910bd8ad94f9d41ecd9c8aa1e6a5 -Dsonar.java.binaries=target -Dsonar.coverage.exclusions=**/../mvnw/**,**/src/test/**,**/model/**,**Application.java
                     '''
-                }
             }
         }
         stage ('Quality Gate') {
