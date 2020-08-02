@@ -3,21 +3,27 @@ pipeline {
     stages {
         stage ('Build Backend') {
             steps {
-                bat 'mvn clean package -DskipTests=true'
+                sh'''
+                  mvn clean package -DskipTests=true
+                '''
             }
         }
         stage ('Unit Tests') {
             steps {
-                bat 'mvn test'
+                sh'''
+                  mvn test
+                '''
             }
         }
         stage ('Sonar Analysis') {
             environment {
-                scannerHome = tool 'SONAR_SCANNER'
+                scannerHome = tool 'sonarScanner'
             }
             steps {
                 withSonarQubeEnv('SONAR_LOCAL') {
-                    bat "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=DeployBack -Dsonar.host.url=http://localhost:9000 -Dsonar.login=cf6826d57f1e453e08ecbd6cf862496472061f66 -Dsonar.java.binaries=target -Dsonar.coverage.exclusions=**/.mvn/**,**/src/test/**,**/model/**,**Application.java"
+                    sh'''
+                     "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=Backend -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=08c561cdf322910bd8ad94f9d41ecd9c8aa1e6a5 -Dsonar.java.binaries=target -Dsonar.coverage.exclusions=**/.mvn/**,**/src/test/**,**/model/**,**Application.java"
+                    '''
                 }
             }
         }
@@ -31,45 +37,55 @@ pipeline {
         }
         stage ('Deploy Backend') {
             steps {
-                deploy adapters: [tomcat8(credentialsId: 'TomcatLogin', path: '', url: 'http://localhost:8001/')], contextPath: 'tasks-backend', war: 'target/tasks-backend.war'
+                deploy adapters: [tomcat8(credentialsId: 'tomcat-login', path: '', url: 'http://tomcat:8000/')], contextPath: 'tasks-backend', war: 'target/tasks-backend.war'
             }
         }
         stage ('API Test') {
             steps {
                 dir('api-test') {
-                    git credentialsId: 'github_login', url: 'https://github.com/wcaquino/tasks-api-test'
-                    bat 'mvn test'
+                    git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-api-test'
+                    sh'''
+                      mvn test
+                    '''
                 }
             }
         }
         stage ('Deploy Frontend') {
             steps {
                 dir('frontend') {
-                    git credentialsId: 'github_login', url: 'https://github.com/wcaquino/tasks-frontend'
-                    bat 'mvn clean package'
-                    deploy adapters: [tomcat8(credentialsId: 'TomcatLogin', path: '', url: 'http://localhost:8001/')], contextPath: 'tasks', war: 'target/tasks.war'
+                    git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-frontend'
+                    sh'''
+                      mvn clean package
+                      deploy adapters: [tomcat8(credentialsId: 'tomcat-login', path: '', url: 'http://tomcat:8000/')], contextPath: 'tasks', war: 'target/tasks.war'
+                    '''
                 }
             }
         }
         stage ('Functional Test') {
             steps {
                 dir('functional-test') {
-                    git credentialsId: 'github_login', url: 'https://github.com/wcaquino/tasks-functional-tests'
-                    bat 'mvn test'
+                    git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-functional-tests'
+                    sh'''
+                      mvn test
+                    '''
                 }
             }
         }
         stage('Deploy Prod') {
             steps {
-                bat 'docker-compose build'
-                bat 'docker-compose up -d'
+                sh'''
+                  docker-compose build
+                  docker-compose up -d
+                '''
             }
         }
         stage ('Health Check') {
             steps {
                 sleep(5)
                 dir('functional-test') {
-                    bat 'mvn verify -Dskip.surefire.tests'
+                    sh'''
+                      mvn verify -Dskip.surefire.tests
+                    '''
                 }
             }
         }
