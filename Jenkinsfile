@@ -5,7 +5,7 @@ pipeline {
             steps {
                 sh'''
                   cd ${WORKSPACE}
-                  mvnw clean package -DskipTests=true
+                  ./mvnw clean package -DskipTests=true
                 '''
             }
         }
@@ -13,7 +13,7 @@ pipeline {
             steps {
                 sh'''
                   cd ${WORKSPACE}
-                  mvnw test
+                  ./mvnw test
                 '''
             }
         }
@@ -24,7 +24,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SONAR_LOCAL') {
                     sh'''
-                     "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=Backend -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=08c561cdf322910bd8ad94f9d41ecd9c8aa1e6a5 -Dsonar.java.binaries=target -Dsonar.coverage.exclusions=**/.mvnw/**,**/src/test/**,**/model/**,**Application.java"
+                     "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=Backend -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=08c561cdf322910bd8ad94f9d41ecd9c8aa1e6a5 -Dsonar.java.binaries=target -Dsonar.coverage.exclusions=**/../mvnw/**,**/src/test/**,**/model/**,**Application.java"
                     '''
                 }
             }
@@ -48,7 +48,7 @@ pipeline {
                     git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-api-test'
                     sh'''
                       cd ${WORKSPACE}
-                      mvnw test
+                      ./mvnw test
                     '''
                 }
             }
@@ -59,7 +59,7 @@ pipeline {
                     git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-frontend'
                     sh'''
                       cd ${WORKSPACE}
-                      mvnw clean package
+                      ./mvnw clean package
                       deploy adapters: [tomcat8(credentialsId: 'tomcat-login', path: '', url: 'http://tomcat:8000/')], contextPath: 'tasks', war: 'target/tasks.war'
                     '''
                 }
@@ -71,7 +71,7 @@ pipeline {
                     git credentialsId: 'github-secret', url: 'https://github.com/wcaquino/tasks-functional-tests'
                     sh'''
                       cd ${WORKSPACE}
-                      mvnw test
+                      ./mvnw test
                     '''
                 }
             }
@@ -89,7 +89,7 @@ pipeline {
                 sleep(5)
                 dir('functional-test') {
                     sh'''
-                      mvnw verify -Dskip.surefire.tests
+                      ./mvnw verify -Dskip.surefire.tests
                     '''
                 }
             }
